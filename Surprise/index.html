@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Special Surprise</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sacramento&display=swap');
+        body {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8) url('https://source.unsplash.com/1600x900/?love,hearts') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .container, .heart-container {
+            width: 80%;
+            max-width: 600px;
+            background: rgba(255, 182, 193, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .heart-button {
+            font-size: 50px;
+            color: red;
+            background: none;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            animation: pulse 1.5s infinite;
+        }
+        .message {
+            font-size: 28px;
+            font-family: 'Sacramento', cursive;
+            font-weight: bold;
+            color: #ffcccb;
+            text-shadow: 2px 2px 10px rgba(255, 105, 180, 0.8);
+            text-align: center;
+            max-width: 90%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .timer {
+            font-size: 30px;
+            font-weight: bold;
+            margin-top: 20px;
+            display: none;
+            color: #FFD700;
+            animation: pulse 1s infinite;
+        }
+        .video-container {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80vw;
+            max-width: 800px;
+            height: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            border-radius: 15px;
+            box-shadow: 0px 0px 20px rgba(255, 105, 180, 0.8);
+            flex-direction: column;
+        }
+        video {
+            width: 100%;
+            border-radius: 15px;
+            animation: fade-in 2s;
+        }
+        .final-message {
+            color: white;
+            margin-top: 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+        audio {
+            display: none;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <audio id="bg-music" loop>
+        <source src="tera-ban-jaunga.mp3" type="audio/mpeg">
+    </audio>
+    <div class="heart-container" id="heartScreen">
+        <div class="message" style="opacity: 1;">💖 Click the heart to start your surprise! 💖</div>
+        <button class="heart-button" onclick="startSurprise()">❤️</button>
+    </div>
+    <div class="container" id="mainContent" style="display: none;">
+        <div class="message" id="msg1">🔥 This is just for you, MADAM JII. Be patient!</div>
+        <div class="message" id="msg2">😜 I bet you’re curious! But you have to wait!</div>
+        <div class="message" id="msg3">💌 Every second you wait is filled with my love for you. Just hold on!</div>
+        <div class="message" id="msg4">💌 A special surprise awaits you… Just be patient, my love!</div>
+        <div class="timer" id="countdown"></div>
+    </div>
+    <script>
+        function startSurprise() {
+            document.getElementById("heartScreen").style.display = "none";
+            document.getElementById("mainContent").style.display = "flex";
+            document.getElementById("bg-music").play();
+            startSequence();
+        }
+
+        function startSequence() {
+            let messages = document.querySelectorAll('.message');
+            let timerDisplay = document.getElementById('countdown');
+            let bgMusic = document.getElementById("bg-music");
+            let index = 0;
+            
+            function showNextMessage() {
+                if (index < messages.length) {
+                    messages[index].style.opacity = "1";
+                    index++;
+                    setTimeout(showNextMessage, 3000);
+                } else {
+                    setTimeout(() => {
+                        timerDisplay.style.display = 'block';
+                        startTimer(0, 1, 30);
+                    }, 2000);
+                }
+            }
+
+            showNextMessage();
+
+            function startTimer(hours, minutes, seconds) {
+                let timeLeft = (hours * 3600) + (minutes * 60) + seconds;
+
+                let timerInterval = setInterval(() => {
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        bgMusic.pause();
+                        revealVideo();
+                        return;
+                    }
+
+                    let hrs = Math.floor(timeLeft / 3600);
+                    let mins = Math.floor((timeLeft % 3600) / 60);
+                    let secs = timeLeft % 60;
+                    timerDisplay.innerHTML = `⏳ ${hrs}h ${mins}m ${secs}s`;
+
+                    timeLeft--;
+                }, 1000);
+            }
+        }
+
+        function revealVideo() {
+            document.body.innerHTML = "";
+            let videoWrapper = document.createElement('div');
+            videoWrapper.classList.add('video-container');
+            
+            let newVideo = document.createElement('video');
+            newVideo.src = "your-video.mp4";
+            newVideo.controls = true;
+            newVideo.setAttribute("controlsList", "nodownload");
+            newVideo.oncontextmenu = function(e) { e.preventDefault(); };
+            
+            let finalMessage = document.createElement('div');
+            finalMessage.classList.add('final-message');
+            finalMessage.innerHTML = "❤️ Hope you loved it, MADAM JII! ❤️";
+            
+            newVideo.onended = function() {
+                videoWrapper.appendChild(finalMessage);
+            };
+            
+            videoWrapper.appendChild(newVideo);
+            document.body.appendChild(videoWrapper);
+        }
+    </script>
+</body>
+</html>
